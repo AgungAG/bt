@@ -56,8 +56,12 @@ sudo apt install sqlmap -y
 sudo apt install tor -y
 sudo pip3 install uro
 sudo cp bt.sh /usr/local/bin/bt
+sudo cp lab.sh /usr/local/bin/lab
+sudo cp gas.sh /usr/local/bin/gas
 sudo cp ip.sh /usr/local/bin/cip
 sudo chmod +x /usr/local/bin/bt
+sudo chmod +x /usr/local/bin/lab
+sudo chmod +x /usr/local/bin/gas
 sudo chmod +x /usr/local/bin/cip
 sudo mv /etc/tor/torrc /etc/tor/torrc.b
 sudo cp torrc /etc/tor/torrc
