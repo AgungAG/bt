@@ -316,6 +316,5 @@ cd chromedriver-linux64
 sudo mv chromedriver /usr/bin
 
 cd
-cip
 
 print_message "Ready to Bug Hunting..."
