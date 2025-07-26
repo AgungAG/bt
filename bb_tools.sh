@@ -42,7 +42,6 @@ sudo apt install build-essential libssl-dev libffi-dev python3-dev -y
 sudo apt install python3-pip -y
 sudo apt install python3-setuptools -y
 sudo apt install libldns-dev -y
-sudo apt install python-dnspython -y
 sudo apt install git -y
 sudo apt install rename -y
 sudo apt install findutils -y
