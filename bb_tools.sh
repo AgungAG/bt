@@ -38,8 +38,9 @@ sudo apt install libssl-dev -y
 sudo apt install jq -y
 sudo apt install ruby-full -y
 sudo apt install libcurl4-openssl-dev libxml2 libxml2-dev libxslt1-dev ruby-dev build-essential libgmp-dev zlib1g-dev -y
-sudo apt install build-essential libssl-dev libffi-dev python-dev -y
-sudo apt install python-setuptools -y
+sudo apt install build-essential libssl-dev libffi-dev python3-dev -y
+sudo apt install python3-pip -y
+sudo apt install python3-setuptools -y
 sudo apt install libldns-dev -y
 sudo apt install python-dnspython -y
 sudo apt install git -y
@@ -47,11 +48,9 @@ sudo apt install rename -y
 sudo apt install findutils -y
 sudo apt install nodejs -y
 sudo apt install npm -y
-sudo apt install python3-pip -y
 sudo apt install neofetch -y
 sudo apt install screen -y
 sudo apt install speedtest-cli -y
-sudo apt install wpscan -y
 sudo apt install sqlmap -y
 sudo apt install tor -y
 sudo pip3 install uro
