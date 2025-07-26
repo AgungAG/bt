@@ -44,7 +44,7 @@ sudo apt install libldns-dev -y
 sudo apt install python-dnspython -y
 sudo apt install git -y
 sudo apt install rename -y
-sudo apt install xargs -y
+sudo apt install findutils -y
 sudo apt install nodejs -y
 sudo apt install npm -y
 sudo apt install python3-pip -y
@@ -55,6 +55,7 @@ sudo apt install wpscan -y
 sudo apt install sqlmap -y
 sudo apt install tor -y
 sudo pip3 install uro
+sudo pip3 install dnspython -y
 sudo cp bt.sh /usr/local/bin/bt
 sudo cp lab.sh /usr/local/bin/lab
 sudo cp gas.sh /usr/local/bin/gas
