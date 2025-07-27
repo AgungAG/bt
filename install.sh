@@ -2,7 +2,7 @@
 set -e
 
 # ===========================================
-# Bug Bounty Tools Installer - Permanent
+# Bug Bounty Tools Installer - Permanent v2
 # ===========================================
 
 STAMP_FILE="$HOME/.bb_tools_installed"
@@ -28,7 +28,7 @@ fi
 
 # Upgrade & update
 print_message "Proses Upgrade & Update..."
-sudo apt full-upgrade -y
+sudo apt full-upgrade -y || true
 sudo apt update -y
 
 # Install packages wajib
@@ -39,7 +39,7 @@ sudo apt install -y \
     libgmp-dev zlib1g-dev libffi-dev python3-dev python3-pip \
     python3-setuptools libldns-dev git rename findutils \
     nodejs npm neofetch screen speedtest-cli sqlmap tor \
-    unzip cmake
+    unzip cmake wget curl
 
 # Install Python tools
 sudo pip3 install uro dnspython
@@ -57,9 +57,12 @@ sudo cp torrc /etc/tor/torrc
 sudo service tor restart
 
 # Docker + Lab
+print_message "Menginstal Docker..."
+sudo apt remove -y containerd || true
+sudo apt autoremove -y
 sudo apt install -y docker.io
 sudo systemctl enable --now docker
-docker run --restart=always -d -p 8081:80 zxxsnxx/vulnlabyavuzlar
+docker run --restart=always -d -p 8081:80 zxxsnxx/vulnlabyavuzlar || true
 
 # Pastikan cmake & libpcap-dev terinstall
 sudo apt install -y cmake libpcap-dev
@@ -186,10 +189,13 @@ unzip -o xray_linux_amd64.zip
 rm xray_linux_amd64.zip
 
 # Ngrok
-sudo apt install unzip -y
-wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-linux-amd64.zip
-unzip -o ngrok-stable-linux-amd64.zip
+print_message "Menginstal Ngrok..."
+cd ~
+wget -q https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-linux-amd64.zip -O ngrok.zip
+unzip -o ngrok.zip
 sudo mv ngrok /usr/local/bin
+rm ngrok.zip
+which ngrok || echo "Ngrok gagal terinstall!"
 
 cd ~
 mkdir -p html
