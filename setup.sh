@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # ===============================
-# Setup Script - Persistent Version
+# Setup Script - Persistent Version (Updated)
 # ===============================
 
 # Fungsi menampilkan pesan
@@ -20,7 +20,7 @@ if ! grep -q 'export PATH="$HOME/bin:$HOME/go/bin:$PATH"' ~/.bashrc; then
     echo 'export PATH="$HOME/bin:$HOME/go/bin:$PATH"' >> ~/.bashrc
 fi
 
-# Tambahkan PATH untuk sesi saat ini agar bisa langsung digunakan
+# Tambahkan PATH ke sesi ini agar langsung bisa digunakan
 export PATH="$HOME/bin:$HOME/go/bin:$PATH"
 
 # Pastikan hanya dijalankan di Linux
@@ -52,10 +52,18 @@ cp gas.sh ~/bin/gas
 cp ip.sh ~/bin/cip
 chmod +x ~/bin/*
 
-# Setup Tor (menggunakan folder HOME)
+# Setup Tor dengan konfigurasi custom
 print_message "Setup Tor..."
 mkdir -p ~/.tor
 cp torrc ~/.tor/torrc
+
+# Tambahkan alias torcustom ke ~/.bashrc jika belum ada
+if ! grep -q 'alias torcustom=' ~/.bashrc; then
+    echo 'alias torcustom="tor -f \$HOME/.tor/torrc"' >> ~/.bashrc
+fi
+
+# Aktifkan alias torcustom untuk sesi ini
+alias torcustom="tor -f $HOME/.tor/torrc"
 
 # Golang & Tools
 print_message "Instal Golang tools..."
@@ -147,4 +155,4 @@ wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-linux-amd64.zip
 unzip ngrok-stable-linux-amd64.zip
 mv ngrok ~/bin/
 
-print_message "Setup selesai! PATH sudah permanen di ~/.bashrc."
+print_message "Setup selesai! Semua tools bisa langsung digunakan tanpa source ulang."
