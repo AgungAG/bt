@@ -15,11 +15,13 @@ function print_message {
 mkdir -p ~/bin ~/bb_tools ~/go/bin ~/xray ~/html
 chmod +x ~/bin
 
-# Tambahkan PATH ke ~/.bashrc (jika belum ada)
+# Tambahkan PATH permanen ke ~/.bashrc jika belum ada
 if ! grep -q 'export PATH="$HOME/bin:$HOME/go/bin:$PATH"' ~/.bashrc; then
     echo 'export PATH="$HOME/bin:$HOME/go/bin:$PATH"' >> ~/.bashrc
-    source ~/.bashrc
 fi
+
+# Tambahkan PATH untuk sesi saat ini agar bisa langsung digunakan
+export PATH="$HOME/bin:$HOME/go/bin:$PATH"
 
 # Pastikan hanya dijalankan di Linux
 if [[ "$OSTYPE" != "linux-gnu"* ]]; then
