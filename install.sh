@@ -38,7 +38,7 @@ apt install -y \
     libgmp-dev zlib1g-dev libffi-dev python3-dev python3-pip \
     python3-setuptools libldns-dev git rename findutils \
     nodejs npm neofetch screen speedtest-cli sqlmap tor \
-    unzip cmake wget curl gnupg nala
+    unzip cmake wget curl gnupg
 
 # Install Python tools
 pip3 install uro dnspython
