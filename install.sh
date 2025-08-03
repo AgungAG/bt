@@ -81,8 +81,18 @@ if ! command -v go >/dev/null 2>&1; then
     sudo mv go /usr/local
 fi
 
-# Set GOBIN agar go install langsung ke /usr/local/bin
+export GOROOT=/usr/local/go
+export GOPATH=$HOME/go
+export PATH=$GOPATH/bin:$GOROOT/bin:$PATH
 export GOBIN=/usr/local/bin
+export PATH=$PATH:/usr/local/go/bin
+echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bash_profile
+echo 'export GOROOT=/usr/local/go' >> ~/.bash_profile
+echo 'export GOPATH=$HOME/go'	>> ~/.bash_profile			
+echo 'export PATH=$GOPATH/bin:$GOROOT/bin:$PATH' >> ~/.bash_profile
+echo 'export GOBIN=/usr/local/bin' >> ~/.bash_profile
+source ~/.bash_profile
+
 
 # Install Go tools ke /usr/local/bin
 print_message "Installing Golang tools..."
