@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 # ===========================================
 # Bug Bounty Tools Installer - Permanent v2
@@ -39,7 +38,7 @@ apt install -y \
     libgmp-dev zlib1g-dev libffi-dev python3-dev python3-pip \
     python3-setuptools libldns-dev git rename findutils \
     nodejs npm neofetch screen speedtest-cli sqlmap tor \
-    unzip cmake wget curl gnupg
+    unzip cmake wget curl gnupg nala
 
 # Install Python tools
 pip3 install uro dnspython
@@ -77,16 +76,13 @@ fi
 # Install Golang jika belum
 if ! command -v go >/dev/null 2>&1; then
     print_message "Menginstal Golang..."
-    apt install -y golang-go
+    wget https://go.dev/dl/go1.24.5.linux-amd64.tar.gz
+    sudo tar -xvf go1.24.5.linux-amd64.tar.gz
+    sudo mv go /usr/local
 fi
 
 # Set GOBIN agar go install langsung ke /usr/local/bin
 export GOBIN=/usr/local/bin
-
-# Tambahkan ke ~/.bashrc agar PATH tetap jika reboot
-if ! grep -q 'export PATH="/usr/local/bin:$PATH"' ~/.bashrc; then
-    echo 'export PATH="/usr/local/bin:$PATH"' >> ~/.bashrc
-fi
 
 # Install Go tools ke /usr/local/bin
 print_message "Installing Golang tools..."
