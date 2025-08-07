@@ -1,158 +1,156 @@
 #!/bin/bash
+set -euo pipefail
+IFS=$'\n\t'
 
-# ===============================
-# Setup Script - Persistent Version (Updated)
-# ===============================
+# ===========================================
+# Bug Bounty Tools Installer - Permanent v2 (Cleaned)
+# ===========================================
 
-# Fungsi menampilkan pesan
-function print_message {
-    echo "==========================================="
+STAMP_FILE="$HOME/.bb_tools_installed"
+
+print_message() {
+    echo -e "\n==========================================="
     echo "$1"
-    echo "==========================================="
+    echo "===========================================\n"
 }
 
-# Membuat folder permanen
-mkdir -p ~/bin ~/bb_tools ~/go/bin ~/xray ~/html
-chmod +x ~/bin
+install_script() {
+    src="$1"
+    dest="/usr/local/bin/$(basename "$src" .sh)"
+    cp "$src" "$dest"
+    chmod +x "$dest"
+}
 
-# Tambahkan PATH permanen ke ~/.bashrc jika belum ada
-if ! grep -q 'export PATH="$HOME/bin:$HOME/go/bin:$PATH"' ~/.bashrc; then
-    echo 'export PATH="$HOME/bin:$HOME/go/bin:$PATH"' >> ~/.bashrc
-fi
+check_os() {
+    if [[ "$OSTYPE" != "linux-gnu"* ]]; then
+        echo "Script ini hanya mendukung Linux."
+        exit 1
+    fi
+}
 
-# Tambahkan PATH ke sesi ini agar langsung bisa digunakan
-export PATH="$HOME/bin:$HOME/go/bin:$PATH"
+init_apt() {
+    print_message "Proses Upgrade & Update..."
+    apt update -y && apt full-upgrade -y
+}
 
-# Pastikan hanya dijalankan di Linux
-if [[ "$OSTYPE" != "linux-gnu"* ]]; then
-    echo "Script ini hanya untuk Linux. Sistem operasi Anda tidak didukung."
-    exit 1
-fi
+install_base_packages() {
+    print_message "Install paket dasar..."
+    apt install -y --no-install-recommends \
+        build-essential curl wget git unzip jq ruby-full python3 python3-pip \
+        python3-dev python3-setuptools libssl-dev libffi-dev libxml2-dev \
+        libxslt1-dev libgmp-dev libldns-dev zlib1g-dev nodejs npm screen \
+        tor cmake rename gnupg neofetch speedtest-cli sqlmap
+}
 
-# Update paket
-print_message "Update & Upgrade paket..."
-sudo apt update -y && sudo apt full-upgrade -y
+install_python_tools() {
+    pip3 install --break-system-packages uro dnspython
+}
 
-# Install paket wajib
-print_message "Menginstal paket wajib..."
-sudo apt install -y \
-    libcurl4-openssl-dev libssl-dev jq ruby-full \
-    libxml2 libxml2-dev libxslt1-dev ruby-dev build-essential libgmp-dev \
-    zlib1g-dev libffi-dev python3-dev python3-pip python3-setuptools \
-    libldns-dev git rename findutils nodejs npm neofetch screen \
-    speedtest-cli sqlmap tor unzip wget cmake
+configure_custom_scripts() {
+    for script in bt.sh lab.sh gas.sh ip.sh; do
+        install_script "$script"
+    done
+}
 
-sudo pip3 install uro dnspython dirsearch bhedak --break-system-packages
+configure_tor() {
+    TOR_CONF="/etc/tor/torrc"
+    if [[ -f "$TOR_CONF" ]]; then
+        mv "$TOR_CONF" "$TOR_CONF.bak"
+    fi
+    cp torrc "$TOR_CONF"
+    systemctl restart tor
+}
 
-# Salin script custom ke ~/bin
-print_message "Menyalin script custom..."
-cp bt.sh ~/bin/bt
-cp lab.sh ~/bin/lab
-cp gas.sh ~/bin/gas
-cp ip.sh ~/bin/cip
-chmod +x ~/bin/*
+setup_docker_lab() {
+    print_message "Menginstal Docker..."
+    apt remove -y containerd || true
+    apt autoremove -y
+    apt install -y docker.io
+    systemctl enable --now docker
+    docker run --restart=always -d -p 8081:80 zxxsnxx/vulnlabyavuzlar || true
+}
 
-# Setup Tor dengan konfigurasi custom
-print_message "Setup Tor..."
-mkdir -p ~/.tor
-cp torrc ~/.tor/torrc
+install_python_313() {
+    if ! command -v python3.13 >/dev/null 2>&1; then
+        print_message "Menginstal Python 3.13..."
+        apt install -y python3.13
+        python3.13 -m ensurepip --upgrade
+        python3.13 -m pip install --upgrade pip --break-system-packages
+    fi
+}
 
-# Tambahkan alias torcustom ke ~/.bashrc jika belum ada
-if ! grep -q 'alias torcustom=' ~/.bashrc; then
-    echo 'alias torcustom="tor -f \$HOME/.tor/torrc"' >> ~/.bashrc
-fi
+install_golang() {
+    if ! command -v go >/dev/null 2>&1; then
+        print_message "Menginstal Golang..."
+        wget https://go.dev/dl/go1.24.5.linux-amd64.tar.gz
+        tar -xvf go1.24.5.linux-amd64.tar.gz
+        mv go /usr/local
+        rm go1.24.5.linux-amd64.tar.gz
+    fi
 
-# Aktifkan alias torcustom untuk sesi ini
-alias torcustom="tor -f $HOME/.tor/torrc"
+    export GOROOT=/usr/local/go
+    export GOPATH=$HOME/go
+    export GOBIN=/usr/local/bin
+    export PATH=$PATH:$GOROOT/bin:$GOPATH/bin:$GOBIN
 
-# Golang & Tools
-print_message "Instal Golang tools..."
-sudo apt install -y golang-go
-cd ~/bb_tools
+    grep -qxF "export PATH=\$PATH:/usr/local/go/bin" ~/.bash_profile || echo 'export PATH=$PATH:/usr/local/go/bin' >> ~/.bash_profile
+}
 
-go install -v github.com/projectdiscovery/subfinder/v2/cmd/subfinder@latest
-go install -v github.com/tomnomnom/assetfinder@latest
-go install -v github.com/incogbyte/shosubgo@latest
-go install -v github.com/gwen001/github-subdomains@latest
-go install -v github.com/projectdiscovery/chaos-client/cmd/chaos@latest
-go install -v github.com/ffuf/ffuf/v2@latest
-go install -v github.com/OJ/gobuster/v3@latest
-go install -v github.com/projectdiscovery/naabu/v2/cmd/naabu@latest
-go install -v github.com/lc/gau/v2/cmd/gau@latest
-go install -v github.com/tomnomnom/waybackurls@latest
-go install -v github.com/projectdiscovery/katana/cmd/katana@latest
-go install -v github.com/hakluke/hakrawler@latest
-go install -v github.com/tomnomnom/gf@latest
-go install -v github.com/tomnomnom/qsreplace@latest
-go install -v github.com/projectdiscovery/httpx/cmd/httpx@latest
-go install -v github.com/tomnomnom/httprobe@latest
-go install -v github.com/tomnomnom/anew@latest
-go install -v github.com/tomnomnom/unfurl@latest
-go install -v github.com/PentestPad/subzy@latest
-go install -v github.com/takshal/freq@latest
-go install -v github.com/Emoe/kxss@latest
-go install -v github.com/rix4uni/xsschecker@latest
-go install -v github.com/KathanP19/Gxss@latest
+install_go_tools() {
+    print_message "Installing Golang tools..."
+    TOOLS=(
+        github.com/projectdiscovery/subfinder/v2/cmd/subfinder
+        github.com/tomnomnom/assetfinder
+        github.com/incogbyte/shosubgo
+        github.com/gwen001/github-subdomains
+        github.com/projectdiscovery/chaos-client/cmd/chaos
+        github.com/ffuf/ffuf/v2
+        github.com/OJ/gobuster/v3
+        github.com/projectdiscovery/naabu/v2/cmd/naabu
+        github.com/lc/gau/v2/cmd/gau
+        github.com/tomnomnom/waybackurls
+        github.com/projectdiscovery/katana/cmd/katana
+        github.com/hakluke/hakrawler
+        github.com/tomnomnom/gf
+        github.com/tomnomnom/qsreplace
+        github.com/projectdiscovery/httpx/cmd/httpx
+        github.com/tomnomnom/httprobe
+        github.com/tomnomnom/anew
+        github.com/tomnomnom/unfurl
+        github.com/PentestPad/subzy
+        github.com/takshal/freq
+        github.com/Emoe/kxss
+        github.com/rix4uni/xsschecker
+        github.com/KathanP19/Gxss
+    )
+    for tool in "${TOOLS[@]}"; do
+        go install "${tool}@latest"
+    done
+}
 
-# Install CRTSH
-print_message "Install CRTSH..."
-if [ ! -f ~/bin/crtsh ]; then
-    git clone https://github.com/YashGoti/crtsh.py.git
-    cd crtsh.py
-    mv crtsh.py ~/bin/crtsh
-    chmod +x ~/bin/crtsh
-fi
+finalize_setup() {
+    mkdir -p ~/html
+    touch "$STAMP_FILE"
+    print_message "Ready to Bug Hunting... Semua tool sudah terpasang permanen."
+}
 
-# Install Arjun
-print_message "Install Arjun..."
-git clone https://github.com/s0md3v/Arjun.git ~/bb_tools/Arjun
-cd ~/bb_tools/Arjun
-sudo python3 -m pip install . --break-system-packages
+main() {
+    if [[ -f "$STAMP_FILE" ]]; then
+        print_message "Semua tools sudah terinstall. Tidak perlu install ulang."
+        exit 0
+    fi
 
-# Install Dirhunt
-print_message "Install Dirhunt..."
-sudo python3 -m pip install dirhunt --break-system-packages --ignore-installed click
+    check_os
+    init_apt
+    install_base_packages
+    install_python_tools
+    configure_custom_scripts
+    configure_tor
+    setup_docker_lab
+    install_python_313
+    install_golang
+    install_go_tools
+    finalize_setup
+}
 
-# Install ParamsPider
-print_message "Install ParamsPider..."
-git clone https://github.com/devanshbatham/paramspider ~/bb_tools/paramspider
-cd ~/bb_tools/paramspider
-sudo python3 -m pip install . --break-system-packages
-
-# Install URLDedupe
-print_message "Install URLDedupe..."
-git clone https://github.com/ameenmaali/urldedupe.git ~/bb_tools/urldedupe
-cd ~/bb_tools/urldedupe
-cmake CMakeLists.txt && make
-cp urldedupe ~/bin/
-
-# Install RustScan
-print_message "Install RustScan..."
-cd ~/bb_tools
-wget https://github.com/RustScan/RustScan/releases/download/2.3.0/rustscan-2.3.0-x86_64-linux.zip
-unzip rustscan-2.3.0-x86_64-linux.zip
-mv rustscan-2.3.0-x86_64-linux/rustscan ~/bin/
-
-# Install Nuclei
-print_message "Install Nuclei..."
-cd ~/bb_tools
-wget https://github.com/projectdiscovery/nuclei/releases/download/v3.4.7/nuclei_3.4.7_linux_amd64.zip
-unzip nuclei_3.4.7_linux_amd64.zip
-mv nuclei ~/bin/
-
-# Install Xray
-print_message "Install Xray..."
-cd ~/xray
-wget https://github.com/chaitin/xray/releases/download/1.9.11/xray_linux_amd64.zip
-unzip xray_linux_amd64.zip
-chmod +x xray
-mv xray ~/bin/
-
-# Install Ngrok
-print_message "Install Ngrok..."
-cd ~/bb_tools
-wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-stable-linux-amd64.zip
-unzip ngrok-stable-linux-amd64.zip
-mv ngrok ~/bin/
-
-print_message "Setup selesai! Semua tools bisa langsung digunakan tanpa source ulang."
+main "$@"
