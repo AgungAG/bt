@@ -39,7 +39,7 @@ install_base_packages() {
         build-essential curl wget git unzip jq ruby-full python3 python3-pip \
         python3-dev python3-setuptools libssl-dev libffi-dev libxml2-dev \
         libxslt1-dev libgmp-dev libldns-dev zlib1g-dev nodejs npm screen \
-        tor cmake rename gnupg neofetch speedtest-cli sqlmap
+        tor cmake rename gnupg screenfetch speedtest-cli sqlmap
 }
 
 install_python_tools() {
