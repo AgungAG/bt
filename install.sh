@@ -27,18 +27,11 @@ fi
 
 # Upgrade & update
 print_message "Proses Upgrade & Update..."
-apt full-upgrade -y || true
-apt update -y
+apt full-upgrade && apt update -y
 
 # Install packages wajib
 print_message "Install paket dasar..."
-apt install -y \
-    libcurl4-openssl-dev libssl-dev jq ruby-full \
-    libxml2 libxml2-dev libxslt1-dev ruby-dev build-essential \
-    libgmp-dev zlib1g-dev libffi-dev python3-dev python3-pip \
-    python3-setuptools libldns-dev git rename findutils \
-    nodejs npm neofetch screen speedtest-cli sqlmap tor \
-    unzip cmake wget curl gnupg
+apt install libcurl4-openssl-dev libssl-dev jq ruby-full libxml2 libxml2-dev libxslt1-dev ruby-dev build-essential libgmp-dev zlib1g-dev libffi-dev python3-dev python3-pip python3-setuptools libldns-dev git rename findutils nodejs npm neofetch screen speedtest-cli sqlmap tor unzip cmake wget curl gnupg -y
 
 # Install Python tools
 pip3 install uro dnspython
@@ -215,6 +208,7 @@ mv chromedriver-linux64/chromedriver /usr/bin
 git clone https://github.com/coffinxp/loxs.git
 cd loxs
 pip3 install -r requirements.txt
+chmod *.sh
 
 # Folder HTML
 cd ~
