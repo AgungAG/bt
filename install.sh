@@ -34,7 +34,7 @@ print_message "Install paket dasar..."
 apt install libcurl4-openssl-dev libssl-dev jq ruby-full libxml2 libxml2-dev libxslt1-dev ruby-dev build-essential libgmp-dev zlib1g-dev libffi-dev python3-dev python3-pip python3-setuptools libldns-dev git rename findutils nodejs npm neofetch screen speedtest-cli sqlmap tor unzip cmake wget curl gnupg -y
 
 # Install Python tools
-pip3 install uro dnspython
+pip3 install uro dnspython --break-system-packages
 
 # Copy custom scripts
 cp bt.sh /usr/local/bin/bt
