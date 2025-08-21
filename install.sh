@@ -53,7 +53,6 @@ print_message "Menginstal Docker..."
 apt remove -y containerd || true
 apt autoremove -y
 apt install -y docker.io
-systemctl enable --now docker
 docker run --restart=always -d -p 8081:80 zxxsnxx/vulnlabyavuzlar || true
 
 # Pastikan cmake & libpcap-dev terinstall
@@ -70,8 +69,8 @@ fi
 if ! command -v go >/dev/null 2>&1; then
     print_message "Menginstal Golang..."
     wget https://go.dev/dl/go1.24.5.linux-amd64.tar.gz
-    sudo tar -xvf go1.24.5.linux-amd64.tar.gz
-    sudo mv go /usr/local
+    tar -xvf go1.24.5.linux-amd64.tar.gz
+    mv go /usr/local
 fi
 
 export GOROOT=/usr/local/go
