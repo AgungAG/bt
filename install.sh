@@ -206,7 +206,7 @@ mv chromedriver-linux64/chromedriver /usr/bin
 # Loxs
 git clone https://github.com/coffinxp/loxs.git
 cd loxs
-pip3 install -r requirements.txt
+pip3 install -r requirements.txt --break-system-packages
 chmod *.sh
 
 # Folder HTML
