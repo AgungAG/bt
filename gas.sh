@@ -83,33 +83,32 @@ option1() {
 # Fungsi untuk opsi 2 (Google Dorking)
 option2() {
     read -p "Masukkan query Google Dorking (contoh: site:*.ac.id): " query
-
-    # Mengganti spasi dengan + untuk URL encoding
-    encoded_query=$(echo $query | sed 's/ /+/g')
-
-    # File output
     output_file="subdomains.txt"
 
-    # Menghapus file output jika sudah ada
-    rm -f $output_file
+    rm -f "$output_file"
 
-    # Loop untuk mengambil beberapa halaman hasil pencarian
-    for page in {0..9}; do
-        start=$((page * 10))
-        curl -s "https://www.google.com/search?q=$encoded_query&start=$start" -A "Mozilla/5.0" | \
-        grep -oP '(?<=<a href="/url\?q=)(https?://[^&]+)' | \
+    if command -v google &> /dev/null; then
+        # Pakai command google --rua
+        google --rua "$query" | \
         grep -oP 'https?://[^/]*' | \
         sed -e 's|https://||g' -e 's|http://||g' -e 's|www.||g' | \
         grep -v 'google\.com' | \
-        sort -u >> $output_file
-    done
+        sort -u | head -n 500 > "$output_file"
+    else
+        # Fallback ke curl scraping jika command `google` tidak ada
+        for page in {0..49}; do   # 50 halaman x 10 result = 500 URL
+            start=$((page * 10))
+            curl -s "https://www.google.com/search?q=$query&start=$start" -A "Mozilla/5.0" | \
+            grep -oP '(?<=<a href="/url\?q=)(https?://[^&]+)' | \
+            grep -oP 'https?://[^/]*' | \
+            sed -e 's|https://||g' -e 's|http://||g' -e 's|www.||g' | \
+            grep -v 'google\.com' >> "$output_file"
+        done
+        sort -u "$output_file" | head -n 500 > tmpfile && mv tmpfile "$output_file"
+    fi
 
-    # Menghapus duplikat dan menyimpan hasil akhir
-    sort -u $output_file -o $output_file
-
-    echo "Subdomain hasil pencarian telah disimpan di $output_file"
-    echo "Isi file $output_file:"
-    cat $output_file
+    echo "Subdomain hasil pencarian (maksimal 500 URL) telah disimpan di $output_file"
+    cat "$output_file"
     echo
     read -p "Tekan Enter untuk melanjutkan..."
     clear
